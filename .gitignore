@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Database
+*.db
+*.sqlite3
+office_management.db
+
+# Environment variables
+.env
+.env.local
+
+# Uploads
+backend/uploads/documents/*
+!backend/uploads/documents/.gitkeep
+
+# Node
+node_modules/
+dist/
+.vite/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+build/
+*.egg
+
+# Alembic
+alembic/versions/*.pyc
