@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { User, Role } from '@/types';
-import { Edit, UserPlus, Shield } from 'lucide-react';
+import { Edit, UserPlus, Shield, Trash2 } from 'lucide-react';
 
 interface UsersPageProps {
   user: User;
@@ -127,6 +127,28 @@ export default function UsersPage({ user }: UsersPageProps) {
     }
   };
 
+  const handleDeleteUser = async (id: number) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/users/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+        }
+      })
+
+      if(!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'Failed to delete user');
+      }
+
+      loadUsers()
+    } catch (error) {
+      console.error('Failed to delete user:', error)
+      alert('Failed to delete user');
+    }
+  }
+
   const openEditModal = (user: User) => {
     setSelectedUser({ ...user });
     setShowEditModal(true);
@@ -155,6 +177,7 @@ export default function UsersPage({ user }: UsersPageProps) {
 
   return (
     <div className="space-y-6">
+      {/* Add-User Button */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
@@ -171,6 +194,7 @@ export default function UsersPage({ user }: UsersPageProps) {
         )}
       </div>
 
+      {/* Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
@@ -216,6 +240,7 @@ export default function UsersPage({ user }: UsersPageProps) {
         </div>
       </div>
 
+      {/* Department Filter */}
       <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
         <div className="flex items-center gap-4">
           <span className="text-sm font-medium text-gray-700">Filter by Department:</span>
@@ -232,6 +257,7 @@ export default function UsersPage({ user }: UsersPageProps) {
         </div>
       </div>
 
+      {/* User Data Table */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -288,6 +314,12 @@ export default function UsersPage({ user }: UsersPageProps) {
                     >
                       <Edit className="w-4 h-4" />
                     </button>
+                    <button
+                      onClick={() => handleDeleteUser(u.id)}
+                      className="text-blue-600 hover:text-blue-900 mr-3"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </td>
                 )}
               </tr>
@@ -296,6 +328,7 @@ export default function UsersPage({ user }: UsersPageProps) {
         </table>
       </div>
 
+      {/* New user Create Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
@@ -378,6 +411,7 @@ export default function UsersPage({ user }: UsersPageProps) {
         </div>
       )}
 
+      {/* Update User Modal */}
       {showEditModal && selectedUser && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">

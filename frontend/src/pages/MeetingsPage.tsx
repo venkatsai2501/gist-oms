@@ -123,6 +123,15 @@ export default function MeetingsPage({ user }: MeetingsPageProps) {
     }));
   };
 
+  const toggleAllParticipants = () => {
+    setNewMeeting(prev => ({
+      ...prev,
+      participant_ids: prev.participant_ids.length === users.length 
+        ? [] 
+        : users.map(u => u.id)
+    }));
+  };
+
   const getStatusIcon = (status: MeetingStatus) => {
     switch (status) {
       case MeetingStatus.APPROVED:
@@ -406,7 +415,18 @@ export default function MeetingsPage({ user }: MeetingsPageProps) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Participants *</label>
-                <div className="border border-gray-300 rounded-lg p-3 max-h-48 overflow-y-auto">
+                <label className="flex items-center gap-2 py-2 px-3 bg-gray-50 border border-gray-300 rounded-t-lg cursor-pointer hover:bg-gray-100">
+                  <input
+                    type="checkbox"
+                    checked={users.length > 0 && newMeeting.participant_ids.length === users.length}
+                    onChange={toggleAllParticipants}
+                    className="rounded"
+                  />
+                  <span className="text-sm font-medium text-gray-700">
+                    Select All
+                  </span>
+                </label>
+                <div className="border border-gray-300 border-t-0 rounded-b-lg p-3 max-h-48 overflow-y-auto">
                   {users.map(u => (
                     <label key={u.id} className="flex items-center gap-2 py-2 hover:bg-gray-50 cursor-pointer">
                       <input

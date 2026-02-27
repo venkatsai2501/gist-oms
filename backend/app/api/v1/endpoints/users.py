@@ -147,7 +147,7 @@ def delete_user(
             detail="Not authorized to delete this user"
         )
     
-    user.is_active = False
+    db.delete(user)
     db.commit()
     
-    return {"message": "User deactivated successfully"}
+    return {"message": "User deleted successfully"}
