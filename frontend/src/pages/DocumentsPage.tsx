@@ -55,7 +55,7 @@ export default function DocumentsPage({ user }: DocumentsPageProps) {
       department: formData.get('department') as string,
       approval_chain_type: formData.get('approval_chain_type') as ApprovalChainType,
       file,
-    };
+    }
 
     try {
       setUploading(true);
@@ -87,8 +87,15 @@ export default function DocumentsPage({ user }: DocumentsPageProps) {
     }
   };
 
-  const handleDownload = (docId: number) => {
-    window.open(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'}/documents/${docId}/download`, '_blank');
+  const handleDownload = async (docId: number) => {
+    const response = await fetch(`http://localhost:8000/api/v1/documents/${docId}/download`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+        }
+    })
+    const blob = await response.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    window.open(blobUrl);
   };
 
   const openApprovalDialog = (doc: Document, action: ApprovalAction) => {

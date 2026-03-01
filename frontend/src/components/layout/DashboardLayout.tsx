@@ -44,7 +44,7 @@ export default function DashboardLayout({ children, user, onLogout }: DashboardL
   ];
 
   // Add Users menu for admin/director/principal only
-  if (user.role.hierarchy_level <= 2 || user.is_superuser) {
+  if (user.role.hierarchy_level <= 4 || user.is_superuser) {
     navigation.push({ name: 'Users', href: '/users', icon: User });
   }
 
