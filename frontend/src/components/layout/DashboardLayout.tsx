@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -12,7 +12,7 @@ import {
   User
 } from 'lucide-react';
 import type { User as UserType } from '@/types';
-import { authAPI } from '@/services/api';
+import { authAPI, notificationsAPI } from '@/services/api';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -22,8 +22,30 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children, user, onLogout }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Fetch unread count immediately
+    fetchUnreadCount();
+
+    // Set up polling every 30 seconds
+    const interval = setInterval(() => {
+      fetchUnreadCount();
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const fetchUnreadCount = async () => {
+    try {
+      const count = await notificationsAPI.getUnreadCount();
+      setUnreadCount(count);
+    } catch (error) {
+      console.error('Failed to fetch unread count:', error);
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -99,6 +121,11 @@ export default function DashboardLayout({ children, user, onLogout }: DashboardL
                 >
                   <item.icon className="w-5 h-5 mr-3" />
                   {item.name}
+                  {item.name === 'Notifications' && unreadCount > 0 && (
+                    <span className="ml-auto px-2 py-0.5 bg-red-500 text-white text-xs rounded-full">
+                      {unreadCount}
+                    </span>
+                  )}
                 </Link>
               );
             })}
