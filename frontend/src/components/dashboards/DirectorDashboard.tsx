@@ -29,17 +29,17 @@ export default function DirectorDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Director Dashboard</h1>
-        <p className="text-gray-600 mt-1">Institute-wide analytics and oversight</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Director Dashboard</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">Institute-wide analytics and oversight</p>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Total Tasks</p>
-              <p className="text-3xl font-bold text-gray-900 mt-1">{data.total_tasks}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Total Tasks</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">{data.total_tasks}</p>
             </div>
             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
               <TrendingUp className="w-6 h-6 text-blue-600" />
@@ -47,10 +47,10 @@ export default function DirectorDashboard() {
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Completion Rate</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Completion Rate</p>
               <p className="text-3xl font-bold text-green-600 mt-1">{data.task_completion_rate}%</p>
             </div>
             <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -59,10 +59,10 @@ export default function DirectorDashboard() {
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Escalated Tasks</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Escalated Tasks</p>
               <p className="text-3xl font-bold text-orange-600 mt-1">{data.escalated_tasks}</p>
             </div>
             <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
@@ -71,10 +71,10 @@ export default function DirectorDashboard() {
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Pending Approvals</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Pending Approvals</p>
               <p className="text-3xl font-bold text-purple-600 mt-1">{data.pending_approvals}</p>
             </div>
             <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -85,8 +85,8 @@ export default function DirectorDashboard() {
       </div>
 
       {/* Department Comparison */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Department Performance</h2>
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Department Performance</h2>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={data.department_stats}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -102,8 +102,8 @@ export default function DirectorDashboard() {
 
       {/* Department Completion Rates */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Completion Rates by Department</h2>
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Completion Rates by Department</h2>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -124,14 +124,14 @@ export default function DirectorDashboard() {
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Department Statistics</h2>
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Department Statistics</h2>
           <div className="space-y-4">
             {data.department_stats?.map((dept: any) => (
-              <div key={dept.department} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+              <div key={dept.department} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <div>
-                  <p className="font-medium text-gray-900">{dept.department}</p>
-                  <p className="text-sm text-gray-600">
+                  <p className="font-medium text-gray-900 dark:text-white">{dept.department}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
                     {dept.completed_tasks} / {dept.total_tasks} tasks completed
                   </p>
                 </div>

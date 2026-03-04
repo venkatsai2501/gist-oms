@@ -59,17 +59,17 @@ export default function EmployeeDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">My Dashboard</h1>
-        <p className="text-gray-600 mt-1">Track your tasks and progress</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">My Dashboard</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">Track your tasks and progress</p>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">My Tasks</p>
-              <p className="text-3xl font-bold text-gray-900 mt-1">{data.my_tasks}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">My Tasks</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">{data.my_tasks}</p>
             </div>
             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
               <CheckCircle className="w-6 h-6 text-blue-600" />
@@ -77,10 +77,10 @@ export default function EmployeeDashboard() {
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Completed</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Completed</p>
               <p className="text-3xl font-bold text-green-600 mt-1">{data.completed_tasks}</p>
             </div>
             <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -89,10 +89,10 @@ export default function EmployeeDashboard() {
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">In Progress</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">In Progress</p>
               <p className="text-3xl font-bold text-blue-600 mt-1">{data.in_progress_tasks}</p>
             </div>
             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -101,10 +101,10 @@ export default function EmployeeDashboard() {
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Overdue</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Overdue</p>
               <p className="text-3xl font-bold text-red-600 mt-1">{data.overdue_tasks}</p>
             </div>
             <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
@@ -115,30 +115,30 @@ export default function EmployeeDashboard() {
       </div>
 
       {/* Recent Tasks */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">Recent Tasks</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Recent Tasks</h2>
         </div>
-        <div className="divide-y divide-gray-200">
+        <div className="divide-y divide-gray-200 dark:divide-gray-700">
           {tasks.length === 0 ? (
-            <div className="p-6 text-center text-gray-500">
+            <div className="p-6 text-center text-gray-500 dark:text-gray-400">
               No tasks assigned yet
             </div>
           ) : (
             tasks.map((task) => (
-              <div key={task.id} className="p-6 hover:bg-gray-50 transition-colors">
+              <div key={task.id} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
-                      <h3 className="text-lg font-medium text-gray-900">{task.title}</h3>
+                      <h3 className="text-lg font-medium text-gray-900 dark:text-white">{task.title}</h3>
                       <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(task.status)}`}>
                         {task.status.replace('_', ' ')}
                       </span>
                     </div>
                     {task.description && (
-                      <p className="text-sm text-gray-600 mb-2">{task.description}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{task.description}</p>
                     )}
-                    <div className="flex items-center space-x-4 text-sm text-gray-500">
+                    <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
                       <span className={getPriorityColor(task.priority)}>
                         Priority: {task.priority}
                       </span>
@@ -151,7 +151,7 @@ export default function EmployeeDashboard() {
                 </div>
                 {task.progress_percentage > 0 && (
                   <div className="mt-3">
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                       <div
                         className="bg-blue-600 h-2 rounded-full transition-all"
                         style={{ width: `${task.progress_percentage}%` }}
@@ -166,15 +166,15 @@ export default function EmployeeDashboard() {
       </div>
 
       {/* Documents Summary */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">My Documents</h2>
-            <p className="text-sm text-gray-600 mt-1">Total documents uploaded</p>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">My Documents</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Total documents uploaded</p>
           </div>
           <div className="flex items-center space-x-2">
             <FileText className="w-8 h-8 text-blue-600" />
-            <span className="text-3xl font-bold text-gray-900">{data.my_documents}</span>
+            <span className="text-3xl font-bold text-gray-900 dark:text-white">{data.my_documents}</span>
           </div>
         </div>
       </div>

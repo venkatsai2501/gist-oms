@@ -171,8 +171,8 @@ export default function MeetingsPage({ user }: MeetingsPageProps) {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Meetings</h1>
-          <p className="text-gray-600 mt-1">Schedule and manage meetings</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Meetings</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">Schedule and manage meetings</p>
         </div>
         { user.role.hierarchy_level <= 4 && <button
           onClick={() => setShowCreateModal(true)}
@@ -184,49 +184,49 @@ export default function MeetingsPage({ user }: MeetingsPageProps) {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex justify-between items-center">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg flex justify-between items-center">
           <span>{error}</span>
           <button onClick={() => setError('')} className="text-red-500 hover:text-red-700 ml-4 font-bold">&times;</button>
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Pending Approval</p>
-              <p className="text-2xl font-bold text-gray-900">{pendingMeetings.length}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Pending Approval</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{pendingMeetings.length}</p>
             </div>
             <AlertCircle className="w-8 h-8 text-yellow-500" />
           </div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Upcoming</p>
-              <p className="text-2xl font-bold text-gray-900">{upcomingMeetings.length}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Upcoming</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{upcomingMeetings.length}</p>
             </div>
             <Calendar className="w-8 h-8 text-blue-500" />
           </div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Total Meetings</p>
-              <p className="text-2xl font-bold text-gray-900">{meetings.length}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Total Meetings</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{meetings.length}</p>
             </div>
             <Users className="w-8 h-8 text-green-500" />
           </div>
         </div>
       </div>
 
-      <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-4 flex-wrap">
-          <span className="text-sm font-medium text-gray-700">Filters:</span>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filters:</span>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as MeetingStatus | '')}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm"
           >
             <option value="">All Status</option>
             <option value={MeetingStatus.PENDING}>Pending</option>
@@ -258,8 +258,8 @@ export default function MeetingsPage({ user }: MeetingsPageProps) {
       </div>
 
       {canApproveMeetings && pendingMeetings.length > 0 && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <p className="text-yellow-800 font-medium">
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4">
+          <p className="text-yellow-800 dark:text-yellow-300 font-medium">
             You have {pendingMeetings.length} meeting{pendingMeetings.length > 1 ? 's' : ''} pending approval
           </p>
         </div>
@@ -267,23 +267,23 @@ export default function MeetingsPage({ user }: MeetingsPageProps) {
 
       <div className="space-y-4">
         {meetings.length === 0 ? (
-          <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200 text-center">
-            <p className="text-gray-500">No meetings found</p>
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 text-center">
+            <p className="text-gray-500 dark:text-gray-400">No meetings found</p>
           </div>
         ) : (
           meetings.map((meeting) => (
             <div
               key={meeting.id}
-              className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+              className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow"
             >
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     {getStatusIcon(meeting.status)}
-                    <h3 className="text-lg font-semibold text-gray-900">{meeting.title}</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{meeting.title}</h3>
                   </div>
                   {meeting.description && (
-                    <p className="text-gray-600 mb-3">{meeting.description}</p>
+                    <p className="text-gray-600 dark:text-gray-400 mb-3">{meeting.description}</p>
                   )}
                   <div className="flex flex-wrap gap-2 mb-3">
                     <span className={`px-2 py-1 text-xs font-medium rounded ${getStatusColor(meeting.status)}`}>
@@ -293,7 +293,7 @@ export default function MeetingsPage({ user }: MeetingsPageProps) {
                       {meeting.priority.toUpperCase()}
                     </span>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600 dark:text-gray-400">
                     <div className="flex items-center gap-2">
                       <Clock className="w-4 h-4" />
                       <span>
@@ -334,56 +334,56 @@ export default function MeetingsPage({ user }: MeetingsPageProps) {
 
       {showCreateModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-            <h2 className="text-2xl font-bold mb-4">Schedule New Meeting</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Schedule New Meeting</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title *</label>
                 <input
                   type="text"
                   value={newMeeting.title}
                   onChange={(e) => setNewMeeting({ ...newMeeting, title: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg"
                   placeholder="e.g., Department Meeting"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
                 <textarea
                   value={newMeeting.description}
                   onChange={(e) => setNewMeeting({ ...newMeeting, description: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg"
                   rows={3}
                   placeholder="Meeting agenda..."
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Start Time *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Time *</label>
                   <input
                     type="datetime-local"
                     value={newMeeting.start_time}
                     onChange={(e) => setNewMeeting({ ...newMeeting, start_time: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">End Time *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Time *</label>
                   <input
                     type="datetime-local"
                     value={newMeeting.end_time}
                     onChange={(e) => setNewMeeting({ ...newMeeting, end_time: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg"
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Venue/Room</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Venue/Room</label>
                   <select
                     value={newMeeting.room_id || ''}
                     onChange={(e) => setNewMeeting({ ...newMeeting, room_id: e.target.value ? parseInt(e.target.value) : undefined })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg"
                   >
                     <option value="">Select room...</option>
                     {resources.map(r => (
@@ -394,11 +394,11 @@ export default function MeetingsPage({ user }: MeetingsPageProps) {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Priority</label>
                   <select
                     value={newMeeting.priority}
                     onChange={(e) => setNewMeeting({ ...newMeeting, priority: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -408,44 +408,44 @@ export default function MeetingsPage({ user }: MeetingsPageProps) {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Location (if no room selected)</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Location (if no room selected)</label>
                 <input
                   type="text"
                   value={newMeeting.location}
                   onChange={(e) => setNewMeeting({ ...newMeeting, location: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg"
                   placeholder="e.g., Online via Zoom"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Participants *</label>
-                <label className="flex items-center gap-2 py-2 px-3 bg-gray-50 border border-gray-300 rounded-t-lg cursor-pointer hover:bg-gray-100">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Participants *</label>
+                <label className="flex items-center gap-2 py-2 px-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-t-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600">
                   <input
                     type="checkbox"
                     checked={users.length > 0 && newMeeting.participant_ids.length === users.length}
                     onChange={toggleAllParticipants}
                     className="rounded"
                   />
-                  <span className="text-sm font-medium text-gray-700">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Select All
                   </span>
                 </label>
-                <div className="border border-gray-300 border-t-0 rounded-b-lg p-3 max-h-48 overflow-y-auto">
+                <div className="border border-gray-300 dark:border-gray-600 border-t-0 rounded-b-lg p-3 max-h-48 overflow-y-auto bg-white dark:bg-gray-800">
                   {users.map(u => (
-                    <label key={u.id} className="flex items-center gap-2 py-2 hover:bg-gray-50 cursor-pointer">
+                    <label key={u.id} className="flex items-center gap-2 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={newMeeting.participant_ids.includes(u.id)}
                         onChange={() => toggleParticipant(u.id)}
                         className="rounded"
                       />
-                      <span className="text-sm">
+                      <span className="text-sm text-gray-900 dark:text-gray-200">
                         {u.full_name} ({u.role.role_name}) - {u.department}
                       </span>
                     </label>
                   ))}
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   {newMeeting.participant_ids.length} participant{newMeeting.participant_ids.length !== 1 ? 's' : ''} selected
                 </p>
               </div>
@@ -454,13 +454,13 @@ export default function MeetingsPage({ user }: MeetingsPageProps) {
               <button
                 onClick={handleCreateMeeting}
                 disabled={!newMeeting.title || !newMeeting.start_time || !newMeeting.end_time || newMeeting.participant_ids.length === 0}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300"
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600"
               >
                 Schedule Meeting
               </button>
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600"
               >
                 Cancel
               </button>

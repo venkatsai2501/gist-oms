@@ -13,7 +13,7 @@ export default function LoadingSpinner({ text, size = 'md' }: LoadingSpinnerProp
   return (
     <div className="flex flex-col items-center justify-center py-12 gap-3">
       <div className={`animate-spin rounded-full border-b-2 border-blue-600 ${sizeClass}`} />
-      {text && <p className="text-gray-500 text-sm">{text}</p>}
+      {text && <p className="text-gray-500 dark:text-gray-400 text-sm">{text}</p>}
     </div>
   );
 }

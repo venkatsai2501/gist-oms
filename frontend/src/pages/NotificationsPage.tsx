@@ -70,8 +70,8 @@ export default function NotificationsPage() {
     <div className="space-y-6 max-w-3xl">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Notifications</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Notifications</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
             {loading ? 'Loading...' : unreadCount > 0 ? `${unreadCount} unread` : 'All caught up'}
           </p>
         </div>
@@ -101,10 +101,10 @@ export default function NotificationsPage() {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-          <BellOff className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500 font-medium">No notifications</p>
-          <p className="text-gray-400 text-sm mt-1">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-12 text-center">
+          <BellOff className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+          <p className="text-gray-500 dark:text-gray-400 font-medium">No notifications</p>
+          <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">
             {unreadOnly ? 'No unread notifications.' : "You're all caught up!"}
           </p>
         </div>
@@ -113,10 +113,10 @@ export default function NotificationsPage() {
           {filtered.map((notification) => (
             <div
               key={notification.id}
-              className={`bg-white rounded-lg border p-4 transition-colors ${
+              className={`rounded-lg border p-4 transition-colors ${
                 notification.is_read
-                  ? 'border-gray-200'
-                  : 'border-blue-200 bg-blue-50'
+                  ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                  : 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700'
               }`}
             >
               <div className="flex items-start justify-between gap-4">
@@ -126,15 +126,15 @@ export default function NotificationsPage() {
                   </span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <p className={`text-gray-900 truncate ${!notification.is_read ? 'font-semibold' : 'font-medium'}`}>
+                      <p className={`text-gray-900 dark:text-gray-100 truncate ${!notification.is_read ? 'font-semibold' : 'font-medium'}`}>
                         {notification.title}
                       </p>
                       {!notification.is_read && (
                         <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
                       )}
                     </div>
-                    <p className="text-sm text-gray-600">{notification.message}</p>
-                    <p className="text-xs text-gray-400 mt-1.5">{formatTimeAgo(notification.created_at)}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{notification.message}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1.5">{formatTimeAgo(notification.created_at)}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
@@ -155,7 +155,7 @@ export default function NotificationsPage() {
       )}
 
       {!loading && notifications.length > 0 && (
-        <p className="text-xs text-gray-400 text-center">
+        <p className="text-xs text-gray-400 dark:text-gray-500 text-center">
           Showing {filtered.length} of {notifications.length} notifications
         </p>
       )}
