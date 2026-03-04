@@ -123,6 +123,15 @@ export default function MeetingsPage({ user }: MeetingsPageProps) {
     }));
   };
 
+  const toggleAllParticipants = () => {
+    setNewMeeting(prev => ({
+      ...prev,
+      participant_ids: prev.participant_ids.length === users.length 
+        ? [] 
+        : users.map(u => u.id)
+    }));
+  };
+
   const getStatusIcon = (status: MeetingStatus) => {
     switch (status) {
       case MeetingStatus.APPROVED:
@@ -168,13 +177,13 @@ export default function MeetingsPage({ user }: MeetingsPageProps) {
           <h1 className="text-3xl font-bold text-gray-900">Meetings</h1>
           <p className="text-gray-600 mt-1">Schedule and manage meetings</p>
         </div>
-        <button
+        { user.role.hierarchy_level <= 4 && <button
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="flex items-center gap-2 px-4 py-2  bg-blue-600 text-white rounded-lg hover:bg-blue-700"
         >
           <Plus className="w-5 h-5" />
           Schedule Meeting
-        </button>
+        </button> }
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -406,7 +415,18 @@ export default function MeetingsPage({ user }: MeetingsPageProps) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Participants *</label>
-                <div className="border border-gray-300 rounded-lg p-3 max-h-48 overflow-y-auto">
+                <label className="flex items-center gap-2 py-2 px-3 bg-gray-50 border border-gray-300 rounded-t-lg cursor-pointer hover:bg-gray-100">
+                  <input
+                    type="checkbox"
+                    checked={users.length > 0 && newMeeting.participant_ids.length === users.length}
+                    onChange={toggleAllParticipants}
+                    className="rounded"
+                  />
+                  <span className="text-sm font-medium text-gray-700">
+                    Select All
+                  </span>
+                </label>
+                <div className="border border-gray-300 border-t-0 rounded-b-lg p-3 max-h-48 overflow-y-auto">
                   {users.map(u => (
                     <label key={u.id} className="flex items-center gap-2 py-2 hover:bg-gray-50 cursor-pointer">
                       <input
