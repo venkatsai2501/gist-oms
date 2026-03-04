@@ -110,14 +110,18 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
         </form>
 
         <div className="mt-6 text-center text-sm text-gray-600">
-          <p className="font-semibold mb-2">Demo Credentials:</p>
-          <div className="space-y-1 text-xs">
-            <p>Director: director@gist.edu / director123</p>
-            <p>Principal: principal@gist.edu / principal123</p>
-            <p>VP: vp@gist.edu / vp123</p>
-            <p>HOD: hod.computerscience@gist.edu / hod123</p>
-            <p>Employee: emp1.computerscience@gist.edu / emp123</p>
-          </div>
+          {import.meta.env.DEV && (
+            <>
+              <p className="font-semibold mb-2">Demo Credentials:</p>
+              <div className="space-y-1 text-xs">
+                <p>Director: director@gist.edu / director123</p>
+                <p>Principal: principal@gist.edu / principal123</p>
+                <p>VP: vp@gist.edu / vp123</p>
+                <p>HOD: hod.computerscience@gist.edu / hod123</p>
+                <p>Employee: emp1.computerscience@gist.edu / emp123</p>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

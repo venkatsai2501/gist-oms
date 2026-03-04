@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { CheckCircle, Clock, AlertCircle, FileText } from 'lucide-react';
 import { reportsAPI, tasksAPI } from '@/services/api';
 import type { DashboardData, Task } from '@/types';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 export default function EmployeeDashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
@@ -22,7 +23,7 @@ export default function EmployeeDashboard() {
   }, []);
 
   if (loading) {
-    return <div className="text-center py-12">Loading dashboard...</div>;
+    return <LoadingSpinner text="Loading dashboard..." />;
   }
 
   if (!data) {

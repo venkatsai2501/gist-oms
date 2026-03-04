@@ -3,6 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { TrendingUp, FileCheck, AlertTriangle, Users } from 'lucide-react';
 import { reportsAPI } from '@/services/api';
 import type { DashboardData } from '@/types';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 export default function DirectorDashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
@@ -19,7 +20,7 @@ export default function DirectorDashboard() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="text-center py-12">Loading dashboard...</div>;
+  if (loading) return <LoadingSpinner text="Loading dashboard..." />;
   if (error) return <div className="text-center py-12 text-red-600">Error: {error}</div>;
   if (!data) return <div className="text-center py-12">No data available</div>;
 

@@ -14,6 +14,7 @@ import NotificationsPage from './pages/NotificationsPage';
 import UsersPage from './pages/UsersPage';
 import { authAPI } from './services/api';
 import type { User } from './types';
+import LoadingSpinner from './components/LoadingSpinner';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -36,7 +37,7 @@ function App() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Loading...</div>
+        <LoadingSpinner text="Loading..." size="lg" />
       </div>
     );
   }

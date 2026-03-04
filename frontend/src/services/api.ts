@@ -3,19 +3,25 @@ import type {
   LoginCredentials,
   AuthResponse,
   User,
+  Role,
   Task,
+  TaskCreatePayload,
+  TaskUpdatePayload,
+  TaskComment,
   Document,
   Meeting,
+  MeetingCreatePayload,
+  Resource,
   Notification,
   DashboardData,
   DocumentUploadPayload,
   DocumentApproval,
+  UserCreatePayload,
+  UserUpdatePayload,
 } from '@/types';
 import { ApprovalAction } from '@/types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
-
-console.log('API URL:', API_URL);
 
 const api = axios.create({
   baseURL: API_URL,
@@ -26,7 +32,6 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  console.log('API Request:', config.method?.toUpperCase(), config.url);
   const token = localStorage.getItem('access_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -35,12 +40,11 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use(
-  (response) => {
-    console.log('API Response:', response.status, response.config.url);
-    return response;
-  },
+  (response) => response,
   (error) => {
-    console.error('API Error:', error.message, error.response?.status, error.config?.url);
+    if (import.meta.env.DEV) {
+      console.error('API Error:', error.message, error.response?.status, error.config?.url);
+    }
     if (error.response?.status === 401) {
       localStorage.removeItem('access_token');
       window.location.href = '/login';
@@ -77,12 +81,12 @@ export const tasksAPI = {
     return response.data;
   },
   
-  createTask: async (task: any): Promise<Task> => {
+  createTask: async (task: TaskCreatePayload): Promise<Task> => {
     const response = await api.post<Task>('/tasks/', task);
     return response.data;
   },
   
-  updateTask: async (id: number, task: any): Promise<Task> => {
+  updateTask: async (id: number, task: TaskUpdatePayload): Promise<Task> => {
     const response = await api.put<Task>(`/tasks/${id}`, task);
     return response.data;
   },
@@ -96,19 +100,19 @@ export const tasksAPI = {
     await api.delete(`/tasks/${id}`);
   },
 
-  getTaskComments: async (id: number): Promise<any[]> => {
-    const response = await api.get(`/tasks/${id}/comments`);
+  getTaskComments: async (id: number): Promise<TaskComment[]> => {
+    const response = await api.get<TaskComment[]>(`/tasks/${id}/comments`);
     return response.data;
   },
 
-  addTaskComment: async (id: number, comment: string): Promise<any> => {
-    const response = await api.post(`/tasks/${id}/comments`, { comment });
+  addTaskComment: async (id: number, comment: string): Promise<TaskComment> => {
+    const response = await api.post<TaskComment>(`/tasks/${id}/comments`, { comment });
     return response.data;
   },
 };
 
 export const documentsAPI = {
-  getDocuments: async (params?: any): Promise<Document[]> => {
+  getDocuments: async (params?: { status?: string; department?: string; my_uploads?: boolean; pending_approval?: boolean }): Promise<Document[]> => {
     const response = await api.get<Document[]>('/documents/', { params });
     return response.data;
   },
@@ -140,6 +144,11 @@ export const documentsAPI = {
     return response.data;
   },
 
+  downloadDocument: async (id: number): Promise<Blob> => {
+    const response = await api.get(`/documents/${id}/download`, { responseType: 'blob' });
+    return response.data;
+  },
+
   approveDocument: async (
     id: number,
     action: ApprovalAction,
@@ -164,7 +173,7 @@ export const meetingsAPI = {
     return response.data;
   },
   
-  createMeeting: async (meeting: any): Promise<Meeting> => {
+  createMeeting: async (meeting: MeetingCreatePayload): Promise<Meeting> => {
     const response = await api.post<Meeting>('/meetings/', meeting);
     return response.data;
   },
@@ -179,19 +188,48 @@ export const meetingsAPI = {
     return response.data;
   },
 
-  getResources: async (params?: any): Promise<any[]> => {
-    const response = await api.get('/meetings/resources/', { params });
+  getResources: async (params?: { available_only?: boolean }): Promise<Resource[]> => {
+    const response = await api.get<Resource[]>('/meetings/resources/', { params });
     return response.data;
   },
 
-  getParticipants: async (id: number): Promise<any[]> => {
-    const response = await api.get(`/meetings/${id}/participants`);
+  getParticipants: async (id: number): Promise<User[]> => {
+    const response = await api.get<User[]>(`/meetings/${id}/participants`);
+    return response.data;
+  },
+};
+
+export const usersAPI = {
+  getUsers: async (params?: { department?: string }): Promise<User[]> => {
+    const cleanParams = params?.department ? { department: params.department } : {};
+    const response = await api.get<User[]>('/users/', { params: cleanParams });
+    return response.data;
+  },
+
+  createUser: async (user: UserCreatePayload): Promise<User> => {
+    const response = await api.post<User>('/users/', user);
+    return response.data;
+  },
+
+  updateUser: async (id: number, user: UserUpdatePayload): Promise<User> => {
+    const response = await api.put<User>(`/users/${id}`, user);
+    return response.data;
+  },
+
+  deleteUser: async (id: number): Promise<void> => {
+    await api.delete(`/users/${id}`);
+  },
+};
+
+export const rolesAPI = {
+  getRoles: async (): Promise<Role[]> => {
+    const response = await api.get<Role[]>('/roles/');
     return response.data;
   },
 };
 
 export const notificationsAPI = {
-  getNotifications: async (params?: any): Promise<Notification[]> => {
+  getNotifications: async (params?: { unread_only?: boolean }): Promise<Notification[]> => {
     const response = await api.get<Notification[]>('/notifications/', { params });
     return response.data;
   },

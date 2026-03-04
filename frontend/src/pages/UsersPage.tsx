@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { User, Role } from '@/types';
+import { User, Role, UserCreatePayload } from '@/types';
+import { usersAPI, rolesAPI } from '@/services/api';
 import { Edit, UserPlus, Shield, Trash2 } from 'lucide-react';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface UsersPageProps {
   user: User;
@@ -14,8 +16,9 @@ export default function UsersPage({ user }: UsersPageProps) {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [departmentFilter, setDepartmentFilter] = useState('');
+  const [error, setError] = useState('');
 
-  const [newUser, setNewUser] = useState({
+  const [newUser, setNewUser] = useState<UserCreatePayload>({
     email: '',
     password: '',
     full_name: '',
@@ -38,13 +41,7 @@ export default function UsersPage({ user }: UsersPageProps) {
 
   const loadUsers = async () => {
     try {
-      const params = departmentFilter ? `?department=${departmentFilter}` : '';
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/users/${params}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
-      });
-      const data = await response.json();
+      const data = await usersAPI.getUsers({ department: departmentFilter || undefined });
       setUsers(data);
     } catch (error) {
       console.error('Failed to load users:', error);
@@ -55,12 +52,7 @@ export default function UsersPage({ user }: UsersPageProps) {
 
   const loadRoles = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/roles/`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
-      });
-      const data = await response.json();
+      const data = await rolesAPI.getRoles();
       setRoles(data);
     } catch (error) {
       console.error('Failed to load roles:', error);
@@ -69,85 +61,44 @@ export default function UsersPage({ user }: UsersPageProps) {
 
   const handleCreateUser = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/users/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
-        body: JSON.stringify(newUser),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.detail || 'Failed to create user');
-      }
-
+      await usersAPI.createUser(newUser);
       setShowCreateModal(false);
-      setNewUser({
-        email: '',
-        password: '',
-        full_name: '',
-        role_id: 5,
-        department: '',
-      });
+      setError('');
+      setNewUser({ email: '', password: '', full_name: '', role_id: 5, department: '' });
       loadUsers();
     } catch (error: any) {
       console.error('Failed to create user:', error);
-      alert(error.message || 'Failed to create user');
+      setError(error.response?.data?.detail || error.message || 'Failed to create user');
     }
   };
 
   const handleUpdateUser = async () => {
     if (!selectedUser) return;
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/users/${selectedUser.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
-        body: JSON.stringify({
-          full_name: selectedUser.full_name,
-          department: selectedUser.department,
-          is_active: selectedUser.is_active,
-        }),
+      await usersAPI.updateUser(selectedUser.id, {
+        full_name: selectedUser.full_name,
+        department: selectedUser.department,
+        is_active: selectedUser.is_active,
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to update user');
-      }
-
       setShowEditModal(false);
       setSelectedUser(null);
+      setError('');
       loadUsers();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update user:', error);
-      alert('Failed to update user');
+      setError(error.response?.data?.detail || 'Failed to update user');
     }
   };
 
   const handleDeleteUser = async (id: number) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/users/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        }
-      })
-
-      if(!response.ok) {
-        const error = await response.json();
-        throw new Error(error.detail || 'Failed to delete user');
-      }
-
-      loadUsers()
-    } catch (error) {
-      console.error('Failed to delete user:', error)
-      alert('Failed to delete user');
+      await usersAPI.deleteUser(id);
+      loadUsers();
+    } catch (error: any) {
+      console.error('Failed to delete user:', error);
+      setError(error.response?.data?.detail || 'Failed to delete user');
     }
-  }
+  };
 
   const openEditModal = (user: User) => {
     setSelectedUser({ ...user });
@@ -172,7 +123,7 @@ export default function UsersPage({ user }: UsersPageProps) {
   const canManageUsers = user.role.hierarchy_level <= 2 || user.is_superuser;
 
   if (loading) {
-    return <div className="text-center py-12">Loading users...</div>;
+    return <LoadingSpinner text="Loading users..." />;
   }
 
   return (
@@ -193,6 +144,13 @@ export default function UsersPage({ user }: UsersPageProps) {
           </button>
         )}
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex justify-between items-center">
+          <span>{error}</span>
+          <button onClick={() => setError('')} className="text-red-500 hover:text-red-700 ml-4 font-bold">&times;</button>
+        </div>
+      )}
 
       {/* Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

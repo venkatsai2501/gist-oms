@@ -3,6 +3,7 @@ import { FileText, Download, CheckCircle, XCircle, AlertCircle, Clock, Upload, X
 import { documentsAPI } from '@/services/api';
 import type { User, Document, DocumentStatus, ApprovalChainType, DocumentUploadPayload } from '@/types';
 import { ApprovalAction } from '@/types';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface DocumentsPageProps {
   user: User;
@@ -88,14 +89,13 @@ export default function DocumentsPage({ user }: DocumentsPageProps) {
   };
 
   const handleDownload = async (docId: number) => {
-    const response = await fetch(`http://localhost:8000/api/v1/documents/${docId}/download`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        }
-    })
-    const blob = await response.blob();
-    const blobUrl = URL.createObjectURL(blob);
-    window.open(blobUrl);
+    try {
+      const blob = await documentsAPI.downloadDocument(docId);
+      const blobUrl = URL.createObjectURL(blob);
+      window.open(blobUrl);
+    } catch (err) {
+      console.error('Download failed:', err);
+    }
   };
 
   const openApprovalDialog = (doc: Document, action: ApprovalAction) => {
@@ -144,11 +144,7 @@ export default function DocumentsPage({ user }: DocumentsPageProps) {
   );
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-lg text-gray-600">Loading documents...</div>
-      </div>
-    );
+    return <LoadingSpinner text="Loading documents..." />;
   }
 
   return (

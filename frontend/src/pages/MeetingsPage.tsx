@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { User, Meeting, MeetingStatus, MeetingCreatePayload, Resource } from '@/types';
-import { meetingsAPI } from '@/services/api';
+import { meetingsAPI, usersAPI } from '@/services/api';
 import { Plus, Calendar, MapPin, Users, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface MeetingsPageProps {
   user: User;
@@ -16,6 +17,7 @@ export default function MeetingsPage({ user }: MeetingsPageProps) {
   const [statusFilter, setStatusFilter] = useState<MeetingStatus | ''>('');
   const [myMeetings, setMyMeetings] = useState(false);
   const [pendingApproval, setPendingApproval] = useState(false);
+  const [error, setError] = useState('');
 
   const [newMeeting, setNewMeeting] = useState<MeetingCreatePayload>({
     title: '',
@@ -61,12 +63,7 @@ export default function MeetingsPage({ user }: MeetingsPageProps) {
 
   const loadUsers = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/users/`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
-      });
-      const data = await response.json();
+      const data = await usersAPI.getUsers();
       setUsers(data);
     } catch (error) {
       console.error('Failed to load users:', error);
@@ -90,7 +87,7 @@ export default function MeetingsPage({ user }: MeetingsPageProps) {
       loadMeetings();
     } catch (error: any) {
       console.error('Failed to create meeting:', error);
-      alert(error.response?.data?.detail || 'Failed to create meeting');
+      setError(error.response?.data?.detail || 'Failed to create meeting');
     }
   };
 
@@ -98,9 +95,9 @@ export default function MeetingsPage({ user }: MeetingsPageProps) {
     try {
       await meetingsAPI.approveMeeting(id);
       loadMeetings();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to approve meeting:', error);
-      alert('Failed to approve meeting');
+      setError(error.response?.data?.detail || 'Failed to approve meeting');
     }
   };
 
@@ -108,9 +105,9 @@ export default function MeetingsPage({ user }: MeetingsPageProps) {
     try {
       await meetingsAPI.rejectMeeting(id);
       loadMeetings();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to reject meeting:', error);
-      alert('Failed to reject meeting');
+      setError(error.response?.data?.detail || 'Failed to reject meeting');
     }
   };
 
@@ -167,7 +164,7 @@ export default function MeetingsPage({ user }: MeetingsPageProps) {
   );
 
   if (loading) {
-    return <div className="text-center py-12">Loading meetings...</div>;
+    return <LoadingSpinner text="Loading meetings..." />;
   }
 
   return (
@@ -185,6 +182,13 @@ export default function MeetingsPage({ user }: MeetingsPageProps) {
           Schedule Meeting
         </button> }
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex justify-between items-center">
+          <span>{error}</span>
+          <button onClick={() => setError('')} className="text-red-500 hover:text-red-700 ml-4 font-bold">&times;</button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">

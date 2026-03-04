@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -12,7 +12,7 @@ import {
   User
 } from 'lucide-react';
 import type { User as UserType } from '@/types';
-import { authAPI } from '@/services/api';
+import { authAPI, notificationsAPI } from '@/services/api';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -21,9 +21,22 @@ interface DashboardLayoutProps {
 }
 
 export default function DashboardLayout({ children, user, onLogout }: DashboardLayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 1024);
+  const [unreadCount, setUnreadCount] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    notificationsAPI.getUnreadCount()
+      .then(setUnreadCount)
+      .catch(() => {});
+    const interval = setInterval(() => {
+      notificationsAPI.getUnreadCount()
+        .then(setUnreadCount)
+        .catch(() => {});
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -87,6 +100,7 @@ export default function DashboardLayout({ children, user, onLogout }: DashboardL
           <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
             {navigation.map((item) => {
               const isActive = location.pathname === item.href;
+              const isNotifications = item.href === '/notifications';
               return (
                 <Link
                   key={item.name}
@@ -97,7 +111,14 @@ export default function DashboardLayout({ children, user, onLogout }: DashboardL
                       : 'text-gray-700 hover:bg-gray-50'
                   }`}
                 >
-                  <item.icon className="w-5 h-5 mr-3" />
+                  <span className="relative mr-3">
+                    <item.icon className="w-5 h-5" />
+                    {isNotifications && unreadCount > 0 && (
+                      <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-0.5 leading-none">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    )}
+                  </span>
                   {item.name}
                 </Link>
               );

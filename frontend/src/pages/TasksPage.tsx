@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { User, Task, TaskStatus, TaskPriority, TaskType, TaskCreatePayload } from '@/types';
-import { tasksAPI } from '@/services/api';
+import { tasksAPI, usersAPI } from '@/services/api';
 import { Plus, Filter, AlertCircle, CheckCircle, Clock, XCircle, MessageSquare, TrendingUp } from 'lucide-react';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface TasksPageProps {
   user: User;
@@ -35,6 +36,7 @@ export default function TasksPage({ user }: TasksPageProps) {
 
   const [escalationReason, setEscalationReason] = useState('');
   const [users, setUsers] = useState<User[]>([]);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     loadTasks();
@@ -59,12 +61,7 @@ export default function TasksPage({ user }: TasksPageProps) {
 
   const loadUsers = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/users/`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
-      });
-      const data = await response.json();
+      const data = await usersAPI.getUsers();
       setUsers(data);
     } catch (error) {
       console.error('Failed to load users:', error);
@@ -75,6 +72,7 @@ export default function TasksPage({ user }: TasksPageProps) {
     try {
       await tasksAPI.createTask(newTask);
       setShowCreateModal(false);
+      setError('');
       setNewTask({
         title: '',
         description: '',
@@ -85,9 +83,9 @@ export default function TasksPage({ user }: TasksPageProps) {
         due_date: '',
       });
       loadTasks();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create task:', error);
-      alert('Failed to create task');
+      setError(error.response?.data?.detail || 'Failed to create task');
     }
   };
 
@@ -98,9 +96,9 @@ export default function TasksPage({ user }: TasksPageProps) {
       setShowUpdateModal(false);
       setSelectedTask(null);
       loadTasks();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update task:', error);
-      alert('Failed to update task');
+      setError(error.response?.data?.detail || 'Failed to update task');
     }
   };
 
@@ -112,9 +110,9 @@ export default function TasksPage({ user }: TasksPageProps) {
       setSelectedTask(null);
       setEscalationReason('');
       loadTasks();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to escalate task:', error);
-      alert('Failed to escalate task');
+      setError(error.response?.data?.detail || 'Failed to escalate task');
     }
   };
 
@@ -180,7 +178,7 @@ export default function TasksPage({ user }: TasksPageProps) {
   const escalatedTasks = tasks.filter(t => t.is_escalated);
 
   if (loading) {
-    return <div className="text-center py-12">Loading tasks...</div>;
+    return <LoadingSpinner text="Loading tasks..." />;
   }
 
   return (
@@ -192,7 +190,7 @@ export default function TasksPage({ user }: TasksPageProps) {
         </div>
         {canCreateTask && (
           <button
-            onClick={() => setShowCreateModal(true)}
+            onClick={() => { setShowCreateModal(true); setError(''); }}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             <Plus className="w-5 h-5" />
@@ -200,6 +198,13 @@ export default function TasksPage({ user }: TasksPageProps) {
           </button>
         )}
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex justify-between items-center">
+          <span>{error}</span>
+          <button onClick={() => setError('')} className="text-red-500 hover:text-red-700 ml-4 font-bold">&times;</button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">

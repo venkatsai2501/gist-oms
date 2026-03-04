@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { AlertTriangle, Clock, Calendar, TrendingUp } from 'lucide-react';
 import { reportsAPI } from '@/services/api';
 import type { DashboardData } from '@/types';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 export default function VPDashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
@@ -14,7 +15,7 @@ export default function VPDashboard() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="text-center py-12">Loading dashboard...</div>;
+  if (loading) return <LoadingSpinner text="Loading dashboard..." />;
   if (!data) return <div className="text-center py-12">Failed to load dashboard data</div>;
 
   return (

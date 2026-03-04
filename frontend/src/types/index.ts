@@ -82,6 +82,27 @@ export interface TaskCreatePayload {
   due_date?: string;
 }
 
+export interface TaskUpdatePayload {
+  status?: TaskStatus;
+  progress_percentage?: number;
+  title?: string;
+  description?: string;
+}
+
+export interface UserCreatePayload {
+  email: string;
+  password: string;
+  full_name: string;
+  role_id: number;
+  department: string;
+}
+
+export interface UserUpdatePayload {
+  full_name?: string;
+  department?: string;
+  is_active?: boolean;
+}
+
 export interface TaskComment {
   id: number;
   task_id: number;
