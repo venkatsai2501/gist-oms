@@ -35,7 +35,16 @@ export default function DashboardLayout({ children, user, onLogout }: DashboardL
       fetchUnreadCount();
     }, 30000);
 
-    return () => clearInterval(interval);
+    // Update immediately when notifications are marked as read in NotificationsPage
+    const onNotificationsUpdated = () => {
+      fetchUnreadCount();
+    };
+    window.addEventListener('notifications-updated', onNotificationsUpdated);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('notifications-updated', onNotificationsUpdated);
+    };
   }, []);
 
   const fetchUnreadCount = async () => {

@@ -23,7 +23,7 @@ export default function NotificationsPage() {
   const loadNotifications = async () => {
     try {
       setLoading(true);
-      const data = await notificationsAPI.getNotifications(filter === 'unread');
+      const data = await notificationsAPI.getNotifications({ unread_only: filter === 'unread' });
       setNotifications(data);
     } catch (error) {
       console.error('Failed to load notifications:', error);
@@ -37,6 +37,7 @@ export default function NotificationsPage() {
       await notificationsAPI.markAsRead(ids);
       await loadNotifications();
       setSelectedIds([]);
+      window.dispatchEvent(new CustomEvent('notifications-updated'));
     } catch (error) {
       console.error('Failed to mark as read:', error);
     }
@@ -46,6 +47,7 @@ export default function NotificationsPage() {
     try {
       await notificationsAPI.markAllAsRead();
       await loadNotifications();
+      window.dispatchEvent(new CustomEvent('notifications-updated'));
     } catch (error) {
       console.error('Failed to mark all as read:', error);
     }
