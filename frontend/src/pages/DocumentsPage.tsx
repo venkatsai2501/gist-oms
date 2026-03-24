@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FileText, Download, CheckCircle, XCircle, AlertCircle, Clock, Upload, X } from 'lucide-react';
 import { documentsAPI } from '@/services/api';
-import type { User, Document, DocumentStatus, ApprovalChainType, DocumentUploadPayload } from '@/types';
+import type { User, Document, DocumentStatus, ApprovalChainType, DocumentUploadPayload, DocumentApproval } from '@/types';
 import { ApprovalAction } from '@/types';
 
 interface DocumentsPageProps {
@@ -19,10 +19,60 @@ export default function DocumentsPage({ user }: DocumentsPageProps) {
   const [approvalComments, setApprovalComments] = useState('');
   const [showApprovalDialog, setShowApprovalDialog] = useState(false);
   const [approvalAction, setApprovalAction] = useState<ApprovalAction | null>(null);
+  const [approvalHistory, setApprovalHistory] = useState<DocumentApproval[]>([]);
+  const [loadingApprovals, setLoadingApprovals] = useState(false);
+  const [docApprovalHistories, setDocApprovalHistories] = useState<Record<number, DocumentApproval[]>>({});
+  const [showCommentsModal, setShowCommentsModal] = useState(false);
+  const [selectedComments, setSelectedComments] = useState<DocumentApproval[]>([]);
+  const [selectedCommentsDocTitle, setSelectedCommentsDocTitle] = useState('');
+
+  type ApprovalChainKey = 'routine' | 'financial' | 'strategic' | 'custom';
+
+  const ROLE_NAMES: Record<number, string> = {
+    1: 'Director',
+    2: 'Principal',
+    3: 'VP',
+    4: 'HOD',
+  };
+
+  const CHAIN_LEVELS: Record<ApprovalChainKey, number[]> = {
+    routine: [4, 3],
+    financial: [4, 2],
+    strategic: [4, 3, 2, 1],
+    custom: [],
+  };
+
+  const getChainLabel = (type: ApprovalChainKey) => {
+    if (type === 'custom') return 'Custom';
+
+    const userLevel = user?.role?.hierarchy_level;
+    const chain = userLevel
+      ? CHAIN_LEVELS[type].filter((level) => level < userLevel)
+      : CHAIN_LEVELS[type];
+
+    if (chain.length === 0) {
+      return '';
+    }
+
+    return chain.map((level) => ROLE_NAMES[level]).join(' → ');
+  };
+
+  const chainOptions = (['routine', 'financial', 'strategic'] as ApprovalChainKey[])
+    .map((type) => ({
+      type,
+      label: getChainLabel(type),
+    }))
+    .filter((option) => option.label);
 
   useEffect(() => {
     loadDocuments();
   }, []);
+
+  useEffect(() => {
+    if (documents.length > 0) {
+      loadAllApprovalHistories();
+    }
+  }, [documents]);
 
   const loadDocuments = async () => {
     try {
@@ -80,7 +130,7 @@ export default function DocumentsPage({ user }: DocumentsPageProps) {
       setSelectedDoc(null);
       setApprovalComments('');
       setApprovalAction(null);
-      loadDocuments();
+      await loadDocuments();
     } catch (err: any) {
       console.error('Approval error:', err);
       setError(err.response?.data?.detail || 'Failed to process approval');
@@ -98,10 +148,59 @@ export default function DocumentsPage({ user }: DocumentsPageProps) {
     window.open(blobUrl);
   };
 
-  const openApprovalDialog = (doc: Document, action: ApprovalAction) => {
+  const loadApprovalHistory = async (documentId: number) => {
+    setLoadingApprovals(true);
+    try {
+      const history = await documentsAPI.getApprovals(documentId);
+      setApprovalHistory(history);
+    } catch (err: any) {
+      console.error('Error loading approval history:', err);
+    } finally {
+      setLoadingApprovals(false);
+    }
+  };
+
+  const viewDocumentComments = async (documentId: number, title: string) => {
+    try {
+      const approvals = await documentsAPI.getApprovals(documentId);
+      const comments = approvals.filter((a) => a.comments && a.comments.trim().length > 0);
+      setSelectedComments(comments);
+      setSelectedCommentsDocTitle(title);
+      setShowCommentsModal(true);
+    } catch (err: any) {
+      console.error('Error loading document comments:', err);
+      setError(err.response?.data?.detail || 'Failed to load document comments');
+    }
+  };
+
+  const loadAllApprovalHistories = async () => {
+    const histories: Record<number, DocumentApproval[]> = {};
+    try {
+      setLoadingApprovals(true);
+      await Promise.all(
+        documents.map(async (doc) => {
+          try {
+            const history = await documentsAPI.getApprovals(doc.id);
+            histories[doc.id] = history;
+          } catch (err: any) {
+            console.error(`Error loading approval history for document ${doc.id}:`, err);
+            histories[doc.id] = [];
+          }
+        })
+      );
+      setDocApprovalHistories(histories);
+    } catch (err: any) {
+      console.error('Error loading all approval histories:', err);
+    } finally {
+      setLoadingApprovals(false);
+    }
+  };
+
+  const openApprovalDialog = async (doc: Document, action: ApprovalAction) => {
     setSelectedDoc(doc);
     setApprovalAction(action);
     setShowApprovalDialog(true);
+    await loadApprovalHistory(doc.id);
   };
 
   const getStatusIcon = (status: DocumentStatus) => {
@@ -158,13 +257,15 @@ export default function DocumentsPage({ user }: DocumentsPageProps) {
           <h1 className="text-3xl font-bold text-gray-900">Documents</h1>
           <p className="text-gray-600 mt-1">Manage documents and approvals</p>
         </div>
-        <button 
-          onClick={() => setShowUploadModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
-          <Upload className="w-4 h-4" />
-          Upload Document
-        </button>
+        {user.role.hierarchy_level !== 1 && (
+          <button 
+            onClick={() => setShowUploadModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            <Upload className="w-4 h-4" />
+            Upload Document
+          </button>
+        )}
       </div>
 
       {error && (
@@ -254,6 +355,9 @@ export default function DocumentsPage({ user }: DocumentsPageProps) {
                     Uploaded
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Comments
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -283,6 +387,25 @@ export default function DocumentsPage({ user }: DocumentsPageProps) {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {new Date(doc.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-700 max-w-xs">
+                      {(() => {
+                        const history = docApprovalHistories[doc.id] || [];
+                        const comments = history.filter(h => h.comments);
+
+                        if (comments.length === 0) {
+                          return '-';
+                        }
+
+                        return (
+                          <button
+                            onClick={() => viewDocumentComments(doc.id, doc.title)}
+                            className="w-full text-left text-xs text-blue-600 hover:text-blue-800 underline"
+                          >
+                            View {comments.length} comment{comments.length > 1 ? 's' : ''}
+                          </button>
+                        );
+                      })()}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
@@ -391,9 +514,11 @@ export default function DocumentsPage({ user }: DocumentsPageProps) {
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  <option value="routine">Routine (HOD → VP)</option>
-                  <option value="financial">Financial (HOD → Principal)</option>
-                  <option value="strategic">Strategic (HOD → VP → Principal → Director)</option>
+                  {chainOptions.map((option) => (
+                    <option key={option.type} value={option.type}>
+                      {option.label}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div>
@@ -426,6 +551,44 @@ export default function DocumentsPage({ user }: DocumentsPageProps) {
         </div>
       )}
 
+      {/* Comments Modal */}
+      {showCommentsModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-lg w-full mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Comments for "{selectedCommentsDocTitle}"</h2>
+              <button onClick={() => setShowCommentsModal(false)} className="text-gray-500 hover:text-gray-700">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {selectedComments.length === 0 ? (
+              <div className="text-sm text-gray-500">No comments available.</div>
+            ) : (
+              <div className="space-y-2 max-h-72 overflow-y-auto">
+                {selectedComments.map((approval) => (
+                  <div key={approval.id} className="border border-gray-200 rounded p-3 bg-gray-50">
+                    <div className="text-sm text-gray-800">{approval.comments}</div>
+                    <div className="mt-1 text-xs text-gray-500">
+                      By approver #{approval.approver_id} · {approval.action.replace('_', ' ').toUpperCase()} · {new Date(approval.created_at).toLocaleString()}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="mt-4 flex justify-end">
+              <button
+                onClick={() => setShowCommentsModal(false)}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Approval Dialog */}
       {showApprovalDialog && selectedDoc && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -453,6 +616,26 @@ export default function DocumentsPage({ user }: DocumentsPageProps) {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
+
+            <div className="mb-4">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">Approval History</h3>
+              {loadingApprovals ? (
+                <div className="text-gray-500 text-sm">Loading history...</div>
+              ) : approvalHistory.length === 0 ? (
+                <div className="text-gray-500 text-sm">No approvals yet.</div>
+              ) : (
+                <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-200 rounded p-2 bg-gray-50">
+                  {approvalHistory.map((approval) => (
+                    <div key={approval.id} className="text-xs text-gray-700 bg-white rounded p-2 border">
+                      <div className="font-medium">{approval.action.replace('_', ' ').toUpperCase()}</div>
+                      {approval.comments && <div>{approval.comments}</div>}
+                      <div className="text-gray-500">By {approval.approver_id} · {new Date(approval.created_at).toLocaleString()}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setShowApprovalDialog(false)}

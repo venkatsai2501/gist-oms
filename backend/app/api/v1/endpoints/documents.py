@@ -25,21 +25,31 @@ APPROVAL_CHAINS: Dict[ApprovalChainType, List[int]] = {
 
 def get_next_approver(db: Session, document: Document) -> User:
     chain = APPROVAL_CHAINS.get(document.approval_chain_type, [4, 3, 2, 1])
-    
+
     approved_levels = [
-        approval.approval_level 
-        for approval in document.approvals 
-        if approval.action == ApprovalAction.APPROVED
+        level for (level,) in db.query(DocumentApproval.approval_level)
+        .filter(
+            DocumentApproval.document_id == document.id,
+            DocumentApproval.action == ApprovalAction.APPROVED
+        )
+        .all()
     ]
-    
+
+    uploader = db.query(User).filter(User.id == document.uploader_id).first()
+    uploader_level = uploader.role.hierarchy_level if uploader else None
+
     for level in chain:
-        if level not in approved_levels:
-            approver = db.query(User).filter(
-                User.role_id == level,
-                User.department == document.department if level == 4 else True
-            ).first()
+        if level in approved_levels or (uploader_level and level >= uploader_level):
+            continue
+
+        approver = db.query(User).filter(
+            User.role_id == level,
+            User.department == document.department if level == 4 else True
+        ).first()
+
+        if approver and approver.id != document.uploader_id:
             return approver
-    
+
     return None
 
 
@@ -220,6 +230,12 @@ def approve_document(
             status_code=403, 
             detail="You are not the current approver for this document"
         )
+
+    if document.uploader_id == current_user.id:
+        raise HTTPException(
+            status_code=403,
+            detail="Uploader cannot approve their own document"
+        )
     
     signature_data = f"{document_id}:{current_user.id}:{datetime.utcnow().isoformat()}"
     signature_hash = hashlib.sha256(signature_data.encode()).hexdigest()
@@ -234,6 +250,8 @@ def approve_document(
     )
     
     db.add(approval)
+    db.flush()
+    db.refresh(document)
     
     if approval_in.action == ApprovalAction.APPROVED:
         next_approver = get_next_approver(db, document)
