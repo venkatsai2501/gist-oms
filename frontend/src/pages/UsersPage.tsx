@@ -79,10 +79,21 @@ export default function UsersPage({ user }: UsersPageProps) {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.detail || 'Failed to create user');
+        const errorData = await response.json();
+        let errorMessage = 'Failed to create user';
+        
+        if (typeof errorData.detail === 'string') {
+          errorMessage = errorData.detail;
+        } else if (errorData.detail && typeof errorData.detail === 'object') {
+          errorMessage = JSON.stringify(errorData.detail);
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        }
+        
+        throw new Error(errorMessage);
       }
 
+      alert('User created successfully!');
       setShowCreateModal(false);
       setNewUser({
         email: '',
@@ -115,19 +126,28 @@ export default function UsersPage({ user }: UsersPageProps) {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update user');
+        const errorData = await response.json();
+        const errorMessage = typeof errorData.detail === 'string' 
+          ? errorData.detail 
+          : 'Failed to update user';
+        throw new Error(errorMessage);
       }
 
+      alert('User updated successfully!');
       setShowEditModal(false);
       setSelectedUser(null);
       loadUsers();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update user:', error);
-      alert('Failed to update user');
+      alert(error.message || 'Failed to update user');
     }
   };
 
   const handleDeleteUser = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this user?')) {
+      return;
+    }
+    
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/users/${id}`, {
         method: 'DELETE',
@@ -138,14 +158,18 @@ export default function UsersPage({ user }: UsersPageProps) {
       })
 
       if(!response.ok) {
-        const error = await response.json();
-        throw new Error(error.detail || 'Failed to delete user');
+        const errorData = await response.json();
+        const errorMessage = typeof errorData.detail === 'string' 
+          ? errorData.detail 
+          : 'Failed to delete user';
+        throw new Error(errorMessage);
       }
 
+      alert('User deleted successfully!');
       loadUsers()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to delete user:', error)
-      alert('Failed to delete user');
+      alert(error.message || 'Failed to delete user');
     }
   }
 
@@ -361,8 +385,12 @@ export default function UsersPage({ user }: UsersPageProps) {
                   value={newUser.password}
                   onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  placeholder="Minimum 6 characters"
+                  placeholder="Minimum 8 characters"
+                  minLength={8}
                 />
+                {newUser.password && newUser.password.length < 8 && (
+                  <p className="text-xs text-red-600 mt-1">Password must be at least 8 characters</p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Role *</label>
@@ -395,7 +423,7 @@ export default function UsersPage({ user }: UsersPageProps) {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={handleCreateUser}
-                disabled={!newUser.email || !newUser.password || !newUser.full_name || !newUser.department}
+                disabled={!newUser.email || !newUser.password || newUser.password.length < 8 || !newUser.full_name || !newUser.department}
                 className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300"
               >
                 Create User
