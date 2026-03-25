@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authAPI } from '@/services/api';
 import type { User } from '@/types';
-import gistHome from '@/assets/gist-home.avif';
+import gistHome from '@/assets/Gist_Home.jpg';
 import gistLogo from '@/assets/GISTLogo_Final.jpg';
 
 interface LoginPageProps {
@@ -83,7 +83,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-orange-400 focus:border-transparent focus:bg-white/30 transition-all"
+                  className="w-full px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg text-black placeholder-black/50 focus:ring-2 focus:ring-orange-400 focus:border-transparent focus:bg-white/30 transition-all"
                   placeholder="user@gist.edu"
                 />
               </div>
@@ -99,7 +99,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-3 pr-12 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-orange-400 focus:border-transparent focus:bg-white/30 transition-all"
+                    className="w-full px-4 py-3 pr-12 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg text-black placeholder-black/50 focus:ring-2 focus:ring-orange-400 focus:border-transparent focus:bg-white/30 transition-all"
                     placeholder="••••••••"
                   />
                   <button
@@ -132,16 +132,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
             </button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-white/80">
-            <p className="font-semibold mb-2">Demo Credentials:</p>
-            <div className="space-y-1 text-xs text-white/70">
-              <p>Director: director@gist.edu / director123</p>
-              <p>Principal: principal@gist.edu / principal123</p>
-              <p>VP: vp@gist.edu / vp123</p>
-              <p>HOD: hod.computerscience@gist.edu / hod123</p>
-              <p>Employee: emp1.computerscience@gist.edu / emp123</p>
-            </div>
-          </div>
+          
         </div>
       </div>
     </div>
