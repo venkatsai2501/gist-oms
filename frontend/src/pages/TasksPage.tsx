@@ -162,6 +162,11 @@ export default function TasksPage({ user }: TasksPageProps) {
     }
   };
 
+  const getUserNameById = (userId: number) => {
+    const matchedUser = users.find((u) => u.id === userId);
+    return matchedUser ? matchedUser.full_name : 'Unknown user';
+  };
+
   const getPriorityColor = (priority: TaskPriority) => {
     switch (priority) {
       case TaskPriority.URGENT:
@@ -308,7 +313,9 @@ export default function TasksPage({ user }: TasksPageProps) {
                       {task.department}
                     </span>
                   </div>
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
+                  <div className="flex flex-col gap-1 text-sm text-gray-600">
+                    <span>Assigned to: {getUserNameById(task.assigned_to_id)}</span>
+                    <span>Assigned by: {getUserNameById(task.assigned_by_id)}</span>
                     <span>Progress: {task.progress_percentage}%</span>
                     {task.due_date && (
                       <span>Due: {new Date(task.due_date).toLocaleDateString()}</span>
