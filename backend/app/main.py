@@ -56,7 +56,7 @@ async def shutdown_event():
 @app.get("/")
 def root():
     return {
-        "message": "GIST Office Management System API",
+        "message": "Sprint Advancement Framework API",
         "version": "1.0.0",
         "docs": "/docs",
         "redoc": "/redoc"

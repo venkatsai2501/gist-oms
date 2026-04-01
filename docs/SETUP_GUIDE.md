@@ -1,4 +1,4 @@
-# GIST OMS - Complete Setup Guide
+# Sprint Advancement Framework - Complete Setup Guide
 
 ## 🚀 Quick Start
 
@@ -13,7 +13,7 @@
 ```bash
 # Create PostgreSQL database
 psql -U postgres
-CREATE DATABASE gist_oms;
+CREATE DATABASE sprint_advancement_framework;
 \q
 ```
 
@@ -125,7 +125,7 @@ Frontend will be available at: http://localhost:5173
 pg_ctl status
 
 # Verify DATABASE_URL in .env
-DATABASE_URL=postgresql://postgres:password@localhost:5432/gist_oms
+DATABASE_URL=postgresql://postgres:password@localhost:5432/sprint_advancement_framework
 ```
 
 **Module Import Errors:**

@@ -1,4 +1,4 @@
-# 🎯 GIST Office Management System (OMS)
+# 🎯 Sprint Advancement Framework (SAF)
 
 A production-ready, role-based office management system with hierarchical approvals, task tracking, document signing, meetings, and comprehensive reporting.
 
@@ -339,4 +339,4 @@ GIST Development Team
 
 ---
 
-**Built with ❤️ for GIST Office Management**
+**Built with ❤️ for Sprint Advancement Framework**

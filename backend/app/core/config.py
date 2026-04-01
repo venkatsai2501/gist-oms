@@ -4,7 +4,7 @@ import secrets
 
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "GIST Office Management System"
+    PROJECT_NAME: str = "Sprint Advancement Framework"
     API_V1_STR: str = "/api/v1"
     
     SECRET_KEY: str = secrets.token_urlsafe(32)

@@ -61,8 +61,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
       <div className="relative z-10 flex items-center justify-center flex-1">
         <div className="max-w-md w-full space-y-8 p-8 bg-white/20 backdrop-blur-md rounded-2xl shadow-2xl border border-white/30">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-white mb-2">GIST OMS</h1>
-            <p className="text-white/80">Office Management System</p>
+            <h1 className="text-4xl font-bold text-white mb-2">Sprint Advancement Framework</h1>
           </div>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">

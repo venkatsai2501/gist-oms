@@ -1,5 +1,5 @@
 """
-Script to load sample data for testing the GIST OMS application
+Script to load sample data for testing the Sprint Advancement Framework application
 """
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
